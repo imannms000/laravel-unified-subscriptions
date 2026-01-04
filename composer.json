@@ -1,0 +1,47 @@
+{
+    "name": "imannms000/laravel-unified-subscrpitions",
+    "description": "Unified subscription management for Laravel supporting Xendit, PayPal, and Mobile IAP (Apple/Google). Gateway-agnostic and fully extendable.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Imannms000\\LaravelUnifiedSubscriptions\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "imannms000",
+            "email": "imannms000@gmail.com",
+            "role": "developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.2",
+        "firebase/php-jwt": "^6.11",
+        "google/apiclient": "^2.18",
+        "illuminate/container": "^12.0|^13.0|^14.0|^15.0",
+        "illuminate/database": "^12.0|^13.0|^14.0|^15.0",
+        "illuminate/events": "^12.0|^13.0|^14.0|^15.0",
+        "illuminate/http": "^12.0|^13.0|^14.0|^15.0",
+        "illuminate/routing": "^12.0|^13.0|^14.0|^15.0",
+        "illuminate/support": "^12.0|^13.0|^14.0|^15.0",
+        "illuminate/validation": "^12.0|^13.0|^14.0|^15.0",
+        "srmklive/paypal": "^3.0",
+        "xendit/xendit-php": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Imannms000\\LaravelUnifiedSubscriptions\\LaravelUnifiedSubscriptionsServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
