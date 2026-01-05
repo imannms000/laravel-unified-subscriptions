@@ -34,8 +34,8 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
         // Daily renewal job
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
-                $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
-                $schedule->job(new RenewSubscriptionsJob)->daily();
+                // $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+                // $schedule->job(new RenewSubscriptionsJob)->daily();
             });
         }
 
