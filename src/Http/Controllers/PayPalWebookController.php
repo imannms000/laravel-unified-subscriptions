@@ -55,7 +55,7 @@ class PayPalWebhookController extends WebhookController
         }
 
         // Signature valid → pass to parent (which will call gateway->handleWebhook())
-        return parent::handle($request);
+        return $this->process($request);
     }
 
     /**

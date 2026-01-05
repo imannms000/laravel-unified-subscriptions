@@ -37,6 +37,6 @@ class XenditWebhookController extends WebhookController
             'payload' => $request->all(),
         ]);
 
-        return parent::handle($request);
+        return $this->process($request);
     }
 }

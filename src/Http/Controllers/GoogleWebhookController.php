@@ -33,9 +33,7 @@ class GoogleWebhookController extends WebhookController
 
         try {
             // Pass the decoded payload to the gateway for processing
-            parent::handle($request);
-
-            return response()->noContent(200);
+            return $this->process($request);
         } catch (\Throwable $e) {
             Log::error('Google Play webhook processing failed', [
                 'exception'  => $e->getMessage(),

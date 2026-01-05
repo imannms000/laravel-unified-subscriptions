@@ -9,6 +9,7 @@ use Imannms000\LaravelUnifiedSubscriptions\Http\Requests\AppleWebhookRequest;
 use Imannms000\LaravelUnifiedSubscriptions\Events\WebhookReceived;
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\AppleGateway;
 use Exception;
+use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 use Imannms000\LaravelUnifiedSubscriptions\Http\Requests\WebhookRequest;
 
 class AppleWebhookController extends WebhookController
@@ -28,28 +29,26 @@ class AppleWebhookController extends WebhookController
         $decodedPayload = $request->all(); // After validation/decoding in FormRequest
 
         Log::info('Apple App Store webhook received', [
-            'gateway' => $this->gateway,
+            'gateway' => $this->gatewayName,
             'notification_type' => $decodedPayload['notificationType'] ?? 'unknown',
             'original_transaction_id' => $decodedPayload['data']['originalTransactionId'] ?? null,
         ]);
 
         event(new WebhookReceived(
-            gateway: $this->gateway,
+            gateway: $this->gatewayName,
             payload: $decodedPayload,
             headers: $request->headers->all()
         ));
 
         try {
             // Pass the fully decoded and verified payload to the gateway
-            $gateway = app(AppleGateway::class);
-            $gateway->handleWebhook($request->duplicate([], $decodedPayload));
-
-            return response()->noContent(200);
+            return $this->process($request->duplicate([], $decodedPayload));
         } catch (Exception $e) {
             Log::error('Apple webhook processing failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'payload' => $originalPayload,
+                'decoded_payload' => $decodedPayload,
             ]);
 
             // Always return 200 to prevent Apple retries

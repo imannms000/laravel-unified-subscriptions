@@ -25,7 +25,7 @@ abstract class WebhookController
 
     abstract protected function resolveGatewayName(): string;
 
-    public function handle(Request $request): Response
+    public function process(Request $request): Response
     {
         // Fire generic event for monitoring
         event(new WebhookReceived($this->gatewayName, $request->all()));
