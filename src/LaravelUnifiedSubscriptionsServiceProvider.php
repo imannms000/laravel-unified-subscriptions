@@ -44,6 +44,6 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/subscription.php', 'subscription');
+        $this->mergeConfigFrom(__DIR__.'/../config.php', 'subscription');
     }
 }
