@@ -8,8 +8,8 @@ use Imannms000\LaravelUnifiedSubscriptions\Http\Controllers\PayPalWebhookControl
 use Imannms000\LaravelUnifiedSubscriptions\Http\Controllers\XenditWebhookController;
 
 Route::prefix('subscriptions/webhooks')->name('subscription.webhooks.')->group(function () {
-    Route::post('apple', AppleWebhookController::class)->name('apple');
-    Route::post('google', GoogleWebhookController::class)->name('google');
-    Route::post('paypal', PayPalWebhookController::class)->name('paypal');
-    Route::post('xendit', XenditWebhookController::class)->name('xendit');
+    Route::post('apple', [AppleWebhookController::class, 'handle'])->name('apple');
+    Route::post('google', [GoogleWebhookController::class, 'handle'])->name('google');
+    Route::post('paypal', [PayPalWebhookController::class, 'handle'])->name('paypal');
+    Route::post('xendit', [XenditWebhookController::class, 'handle'])->name('xendit');
 });
