@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Routing\Controller;
+use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 use Imannms000\LaravelUnifiedSubscriptions\Http\Requests\VerifyAppleSubscriptionRequest;
 
 class AppleSubscriptionController extends Controller

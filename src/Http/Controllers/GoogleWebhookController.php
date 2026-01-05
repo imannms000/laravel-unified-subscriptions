@@ -31,6 +31,11 @@ class GoogleWebhookController extends WebhookController
             'purchase_token'    => $payload['subscriptionNotification']['purchaseToken'] ?? null,
         ]);
 
+        if (isset($payload['testNotification'])) {
+            Log::info('Google Play TEST notification received - connectivity confirmed!');
+            return response()->noContent(); // Early return - no need to process
+        }
+
         try {
             // Pass the decoded payload to the gateway for processing
             return $this->process($request);
