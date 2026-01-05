@@ -7,15 +7,23 @@ use Imannms000\LaravelUnifiedSubscriptions\Http\Controllers\PayPalSubscriptionCo
 use Imannms000\LaravelUnifiedSubscriptions\Http\Controllers\SubscriptionController;
 use Imannms000\LaravelUnifiedSubscriptions\Http\Controllers\XenditSubscriptionController;
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/subscriptions/google/verify', [GoogleSubscriptionController::class, 'verify'])
-        ->name('api.subscriptions.google.verify');
-    Route::post('/subscriptions/apple/verify', [AppleSubscriptionController::class, 'verify'])
-        ->name('api.subscriptions.apple.verify');
-    Route::post('/subscriptions/paypal', [PayPalSubscriptionController::class, 'store'])
-        ->name('api.subscriptions.paypal.store');
-    Route::post('/subscriptions/xendit', [XenditSubscriptionController::class, 'store'])
-        ->name('api.subscriptions.xendit.store');
+Route::middleware(config('subscription.routes.api.middleware', ['api', 'auth:sanctum']))
+    ->prefix(config('subscription.routes.api.prefix', 'api/v1'))
+    ->name('api.')
+    ->group(function () {
+        
+        Route::prefix('subscriptions')->group(function () {
+            Route::post('google/verify', [GoogleSubscriptionController::class, 'verify'])
+                ->name('subscriptions.google.verify');
+            Route::post('apple/verify', [AppleSubscriptionController::class, 'verify'])
+                ->name('subscriptions.apple.verify');
+            Route::post('paypal', [PayPalSubscriptionController::class, 'store'])
+                ->name('subscriptions.paypal.store');
+            Route::post('xendit', [XenditSubscriptionController::class, 'store'])
+                ->name('subscriptions.xendit.store');
+        });
 
-    Route::apiResource('subscriptions', SubscriptionController::class)->only(['index', 'destroy']);
-});
+        // Resource Routes
+        Route::apiResource('subscriptions', SubscriptionController::class)
+            ->only(['index', 'destroy']);
+    });

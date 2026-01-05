@@ -2,7 +2,7 @@
 
 return [
     'models' => [
-        'user' => env('MODEL_USER', \App\Models\User::class),
+        'user' => env('SUBSCRIPTION_MODEL_USER', \App\Models\User::class),
     ],
     'gateways' => [
         'paypal' => [
@@ -27,5 +27,11 @@ return [
             'sandbox' => env('APPLE_SANDBOX', true),
         ],
     ],
+    'routes' => [
+        'api' => [
+            'middleware' => env('SUBSCRIPTION_API_MIDDLEWARE', ['api', 'auth:sanctum']),
+            'prefix' => env('SUBSCRIPTION_API_PREFIX', 'api/v1'),
+        ]
+    ]
 
 ];
