@@ -26,7 +26,7 @@ class GatewayManager
             throw new InvalidArgumentException("Subscription gateway [{$name}] is not defined.");
         }
 
-        $class = $config['driver'] ?? "\\YourVendor\\Subscription\\Gateways\\" . ucfirst($name) . 'Gateway';
+        $class = $config['driver'];
 
         if (! class_exists($class)) {
             throw new InvalidArgumentException("Gateway class [{$class}] does not exist.");
