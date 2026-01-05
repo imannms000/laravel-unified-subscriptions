@@ -6,8 +6,6 @@ use Imannms000\LaravelUnifiedSubscriptions\Models\Subscription;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
 use Carbon\Carbon;
 
-use function Illuminate\Support\now;
-
 trait HasSubscriptions
 {
     public function subscriptions()
