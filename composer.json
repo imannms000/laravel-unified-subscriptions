@@ -1,5 +1,5 @@
 {
-    "name": "imannms000/laravel-unified-subscrpitions",
+    "name": "imannms000/laravel-unified-subscriptions",
     "description": "Unified subscription management for Laravel supporting Xendit, PayPal, and Mobile IAP (Apple/Google). Gateway-agnostic and fully extendable.",
     "type": "library",
     "license": "MIT",
