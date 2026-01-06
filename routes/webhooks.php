@@ -1,4 +1,3 @@
-// src/routes/webhooks.php
 <?php
 
 use Illuminate\Support\Facades\Route;

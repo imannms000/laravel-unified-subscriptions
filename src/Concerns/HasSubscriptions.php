@@ -25,7 +25,7 @@ trait HasSubscriptions
             ->first();
     }
 
-    public function subscribedTo(Plan|int $plan): bool
+    public function subscribedTo(Plan|string $plan): bool
     {
         $planId = $plan instanceof Plan ? $plan->id : $plan;
 
