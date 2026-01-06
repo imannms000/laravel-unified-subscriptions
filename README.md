@@ -4,7 +4,7 @@ A powerful, extensible, and production-ready Laravel package for managing recurr
 
 - **PayPal**
 - **Xendit**
-- **Google Play Billing**
+- [**Google Play Billing**](./docs/GOOGLE.md)
 - **Apple App Store**
 
 Built the **Laravel way** — using traits, events, policies, and form requests.
