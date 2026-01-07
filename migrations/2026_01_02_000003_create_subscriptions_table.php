@@ -22,7 +22,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['subscribable_id', 'subscribable_type', 'gateway_id']);
-            $table->index(['subscribable_type', 'subscribable_id']);
         });
     }
 
