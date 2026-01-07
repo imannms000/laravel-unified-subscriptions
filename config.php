@@ -19,6 +19,7 @@ return [
             'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\XenditGateway::class,
             'secret_key' => env('XENDIT_SECRET_KEY'),
             'callback_token' => env('XENDIT_CALLBACK_TOKEN'),
+            'currencies' => ['IDR', 'PHP', 'MYR', 'THB', 'VND', 'SGD'],
         ],
         'google' => [
             'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\GoogleGateway::class,

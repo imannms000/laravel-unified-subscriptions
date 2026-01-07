@@ -67,10 +67,11 @@ Edit `config/subscription.php`:
 ```php
 return [
     'models' => [
-        'user' => env('MODEL_USER', \App\Models\User::class),
+        'user' => env('SUBSCRIPTION_MODEL_USER', \App\Models\User::class),
     ],
     'gateways' => [
         'paypal' => [
+            'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\PayPalGateway::class,
             'mode' => env('PAYPAL_MODE', 'sandbox'), // or live
             'client_id' => env('PAYPAL_CLIENT_ID'),
             'client_secret' => env('PAYPAL_CLIENT_SECRET'),
@@ -80,18 +81,28 @@ return [
             'cancel_url' => env('PAYPAL_CANCEL_URL'),
         ],
         'xendit' => [
+            'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\XenditGateway::class,
             'secret_key' => env('XENDIT_SECRET_KEY'),
             'callback_token' => env('XENDIT_CALLBACK_TOKEN'),
+            'currencies' => ['IDR', 'PHP', 'MYR', 'THB', 'VND', 'SGD'],
         ],
         'google' => [
+            'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\GoogleGateway::class,
             'package_name' => env('GOOGLE_PLAY_PACKAGE_NAME'),
             'service_account' => env('GOOGLE_PLAY_SERVICE_ACCOUNT', base_path('google-play-service-account.json')),
         ],
         'apple' => [
+            'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\AppleGateway::class,
             'shared_secret' => env('APPLE_SHARED_SECRET'),
             'sandbox' => env('APPLE_SANDBOX', true),
         ],
     ],
+    'routes' => [
+        'api' => [
+            'middleware' => env('SUBSCRIPTION_API_MIDDLEWARE', ['api', 'auth:sanctum']),
+            'prefix' => env('SUBSCRIPTION_API_PREFIX', 'api/v1'),
+        ]
+    ]
 
 ];
 ```
@@ -205,6 +216,161 @@ Event::listen(SubscriptionRenewed::class, function ($event) {
     // Log renewal
 });
 ```
+
+## Commands
+
+### Create a Plan
+
+#### a. Basic monthly plan
+```bash
+php artisan subscription:plan:create "premium" "Premium Monthly" 9.99 --interval=month --trial-days=7 --active
+```
+
+#### b. Yearly plan with custom slug
+```bash
+php artisan subscription:plan:create "pro" "Pro Yearly" 99.99 --slug=pro-annual --interval=year --active
+```
+
+#### c. Free plan
+```bash
+php artisan subscription:plan:create "free" "Free Forever" 0.00 --active
+```
+
+#### d. Plan with gateway-specific pricing (Xendit in IDR)
+```bash
+php artisan subscription:plan:create "premium" "Premium (Indonesia)" 9.99 \
+  --gateway-prices=xendit:150000.00:IDR \
+  --gateway-prices=paypal:9.99:USD \
+  --active
+```
+
+### List a Plan
+
+#### a. List All Plans (Default: newest first)
+```bash
+php artisan subscription:plan:list
+```
+
+#### b. Only Active Plans
+```bash
+php artisan subscription:plan:list --active
+```
+
+#### c. Only Inactive Plans
+```bash
+php artisan subscription:plan:list --inactive
+```
+
+#### d. Filter by Gateway-Specific Pricing
+```bash
+php artisan subscription:plan:list --gateway=google
+```
+
+#### e. Filter by Tier
+```bash
+php artisan subscription:plan:list --tier=pro
+```
+
+#### f. Search by Name or Slug
+```bash
+php artisan subscription:plan:list --search=premium
+```
+
+#### g. Sort by Price (Cheapest First)
+```bash
+php artisan subscription:plan:list --sort=price_asc
+```
+
+#### h. Combine Filters
+```bash
+php artisan subscription:plan:list \
+  --active \
+  --gateway=paypal \
+  --tier=pro \
+  --sort=name_asc
+```
+
+#### i. Sample Output
+```text
+Found 5 subscription plan(s):
+
++----+--------------------+-------------------+-----------------+-------------+----------+--------+-------+----------------------------------+
+| ID | Name               | Slug              | Default Price   | Interval    | Status   | Trial  | Grace | Gateway Prices                   |
++----+--------------------+-------------------+-----------------+-------------+----------+--------+-------+----------------------------------+
+| 8  | Premium Monthly    | premium-monthly   | 9.99 USD        | 1 Month     | Active   | 7 days | -     | xendit: 150000.00 IDR, paypal: 9.99 USD |
+| 7  | Pro Yearly         | pro-yearly        | 99.99 USD       | 1 Year      | Active   | 14 days| 3 days| xendit: 1400000.00 IDR           |
+| 3  | Basic Free         | basic-free        | 0.00 USD        | 1 Month     | Active   | -      | -     | None                             |
++----+--------------------+-------------------+-----------------+-------------+----------+--------+-------+----------------------------------+
+```
+
+### Update a Plan
+
+#### a. Basic Update (Change Price & Name) (using Slug)
+```bash
+php artisan subscription:plan:update premium-monthly \
+  --name="Premium Plus" \
+  --price=19.99
+```
+
+#### b. Update Slug & Deactivate (using ID)
+```bash
+php artisan subscription:plan:update 01KED7BB2NMW5BHXCWAAW3HGTT \
+  --slug=premium-plus-new \
+  --no-active
+```
+
+#### c. Update Interval & Trial (using Slug)
+```bash
+php artisan subscription:plan:update premium-monthly \
+  --interval=year \
+  --interval-count=1 \
+  --trial-days=30
+```
+
+#### d. Update/Add Gateway Prices (using ID)
+```bash
+php artisan subscription:plan:update 01KED7A1HNMG2Y0NTCW08QPYYT \
+  --gateway-prices=xendit:250000:IDR \
+  --gateway-prices=paypal:19.99:USD
+```
+
+#### e. Remove Gateway Price (using Slug)
+```bash
+php artisan subscription:plan:update premium-monthly \
+  --remove-gateway-prices=xendit \
+  --remove-gateway-prices=paypal
+```
+
+#### f. Full Overhaul (using ID)
+```bash
+php artisan subscription:plan:update 01KED78ESDFW7CXJG7PF382818 \
+  --name="Enterprise Annual" \
+  --price=999.00 \
+  --interval=year \
+  --trial-days=60 \
+  --active \
+  --gateway-prices=xendit:15000000:IDR
+```
+
+### Delete a Plan
+
+#### a. Normal Delete (with Confirmation)
+```bash
+php artisan subscription:plan:delete premium-old
+```
+Shows plan details, asks for confirmation, deletes if no active subs.
+
+#### b. Force Delete (No Confirmation)
+```bash
+php artisan subscription:plan:delete 5 --force
+```
+Skips confirmation, permanently deletes.
+
+### c. Attempt to Delete Plan with Active Subscriptions
+```bash
+php artisan subscription:plan:delete premium-monthly
+```
+Shows error: `"Cannot delete... has X active subscription(s)"`
 
 ## Extending with New Gateways
 

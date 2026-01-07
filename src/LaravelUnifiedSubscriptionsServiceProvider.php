@@ -31,6 +31,15 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
         //     'user' => config('subscription.models.user', \App\Models\User::class),
         // ]);
 
+        if ($this->app->runningInConsole()) {
+			$this->commands([
+				\Imannms000\LaravelUnifiedSubscriptions\Commands\CreateSubscriptionPlanCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\ListSubscriptionPlansCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\UpdateSubscriptionPlanCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\DeleteSubscriptionPlanCommand::class,
+			]);
+		}
+
         // Daily renewal job
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
