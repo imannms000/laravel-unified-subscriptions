@@ -10,14 +10,14 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../migrations');
 
         $this->publishes([
             __DIR__.'/../config.php' => config_path('subscription.php'),
         ], 'subscription-config');
 
         $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
+            __DIR__.'/../migrations' => database_path('migrations'),
         ], 'subscription-migrations');
 
         $this->publishes([
