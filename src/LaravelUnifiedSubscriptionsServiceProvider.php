@@ -4,7 +4,6 @@ namespace Imannms000\LaravelUnifiedSubscriptions;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
-use Imannms000\LaravelUnifiedSubscriptions\Jobs\RenewSubscriptionsJob;
 
 class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
 {
@@ -37,14 +36,25 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\ListSubscriptionPlansCommand::class,
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\UpdateSubscriptionPlanCommand::class,
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\DeleteSubscriptionPlanCommand::class,
+                
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\ListSubscriptionsCommand::class,
+
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\FakeCreateSubscriptionCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\FakeRenewSubscriptionCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\FakeCancelSubscriptionCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\FakeExpireSubscriptionCommand::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\ProcessFakeRenewalsCommand::class,
 			]);
 		}
 
-        // Daily renewal job
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
-                // $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+                $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
                 // $schedule->job(new RenewSubscriptionsJob)->daily();
+
+                if (config('subscription.fake.enabled') && config('subscription.fake.auto_renew.enabled')) {
+                    $schedule->command('subscription:fake:process-renewals')->everyMinute()->withoutOverlapping(3);
+                }
             });
         }
 

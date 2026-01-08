@@ -31,6 +31,17 @@ return [
             'shared_secret' => env('APPLE_SHARED_SECRET'),
             'sandbox' => env('APPLE_SANDBOX', true),
         ],
+        'fake' => [
+            'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\FakeGateway::class,
+            'enabled' => env('SUBSCRIPTION_FAKE_GATEWAY_ENABLED', app()->environment(['local', 'testing'])),
+
+            'auto_renew' => [
+                'enabled' => true,
+                'interval' => 5,           // Renew every X
+                'unit' => 'minutes',       // seconds, minutes, hours, days
+                'max_renewals' => 6,       // After 6 renewals → auto-cancel (initial + 6 = 7 periods)
+            ],
+        ],
     ],
     'routes' => [
         'api' => [

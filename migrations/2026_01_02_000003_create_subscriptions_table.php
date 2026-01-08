@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignUlid('plan_id')->constrained()->cascadeOnDelete();
             $table->string('gateway')->index(); // paypal, xendit, google_play, apple
             $table->string('gateway_id')->nullable()->index(); // remote subscription ID
+            $table->unsignedInteger('renewal_count')->default(0);
             $table->timestamp('starts_at')->nullable();
             $table->timestamp('ends_at')->nullable()->index();
             $table->timestamp('trial_ends_at')->nullable()->index();

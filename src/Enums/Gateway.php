@@ -3,6 +3,7 @@
 namespace Imannms000\LaravelUnifiedSubscriptions\Enums;
 
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\AppleGateway;
+use Imannms000\LaravelUnifiedSubscriptions\Gateways\FakeGateway;
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\GoogleGateway;
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\PayPalGateway;
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\XenditGateway;
@@ -13,6 +14,7 @@ enum Gateway: string
     case APPLE = 'apple';
     case PAYPAL = 'paypal';
     case XENDIT = 'xendit';
+    case FAKE = 'fake';
     
     public function toGatewayClass()
     {
@@ -21,6 +23,7 @@ enum Gateway: string
             self::APPLE => AppleGateway::class,
             self::PAYPAL => PayPalGateway::class,
             self::XENDIT => XenditGateway::class,
+            self::FAKE => FakeGateway::class,
         };
     }
 }

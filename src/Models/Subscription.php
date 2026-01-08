@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionPaymentFailed;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionPaymentSucceeded;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionTransactionCreated;
+use Imannms000\LaravelUnifiedSubscriptions\Gateways\FakeGateway;
 
 class Subscription extends Model
 {
@@ -194,5 +195,53 @@ class Subscription extends Model
         }
 
         return $transaction;
+    }
+
+    public function updateEndsAt(\Carbon\Carbon $endsAt)
+    {
+        $this->update(['ends_at' => $endsAt]);
+    }
+
+    public function incrementRenewalCount()
+    {
+        $this->increment('renewal_count');
+    }
+
+    public function resetRenewalCount()
+    {
+        $this->update(['renewal_count' => 0]);
+    }
+
+    public function scopeFakeDueForRenewal($query)
+    {
+        return $query->where('gateway', 'fake')
+                    ->whereNull('canceled_at')
+                    ->whereNotNull('ends_at')
+                    ->where('ends_at', '<=', now());
+    }
+
+    public static function processFakeRenewals(): void
+    {
+        if (!config('subscription.fake.enabled') || !config('subscription.fake.auto_renew.enabled')) {
+            \Log::info('[FakeGateway] Auto-renew disabled or fake gateway not enabled.');
+            return;
+        }
+
+        $gateway = app(FakeGateway::class);
+
+        $count = static::fakeDueForRenewal()->count();
+
+        if ($count === 0) {
+            return;
+        }
+
+        \Log::info("[FakeGateway] Processing {$count} subscription(s) due for renewal.");
+
+        static::fakeDueForRenewal()
+            ->chunk(50, function ($subscriptions) use ($gateway) {
+                foreach ($subscriptions as $subscription) {
+                    $gateway->renewSubscription($subscription);
+                }
+            });
     }
 }

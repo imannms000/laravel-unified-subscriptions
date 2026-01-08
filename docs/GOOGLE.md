@@ -1,3 +1,5 @@
+# Google Play Billing Gateway
+
 ## 1. How to get `google-play-service-account.json`
 
 To get the **google-play-service-account.json** file (required for server-side verification of Google Play Billing subscriptions and real-time notifications), follow these **detailed, step-by-step instructions**. This file is a **service account key** from Google Cloud, linked to your Google Play Console for API access (e.g., validating receipts via Android Publisher API).
