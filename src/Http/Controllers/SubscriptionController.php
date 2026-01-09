@@ -49,7 +49,7 @@ class SubscriptionController extends Controller
     {
         // $this->authorize('cancel', $subscription);
 
-        app(Gateway::from($subscription->gateway)->toGatewayClass())->cancelSubscription($subscription);
+        app($subscription->gateway->toGatewayClass())->cancelSubscription($subscription);
 
         return response()->json([
             'success' => true,
