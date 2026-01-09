@@ -8,6 +8,7 @@ use Imannms000\LaravelUnifiedSubscriptions\Contracts\GatewayInterface;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Subscription;
 use Carbon\Carbon;
 use Exception;
+use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 
 class FakeGateway extends AbstractGateway implements GatewayInterface
 {
@@ -18,6 +19,11 @@ class FakeGateway extends AbstractGateway implements GatewayInterface
         if (!config('subscription.gateways.fake.enabled')) {
             throw new Exception('Fake gateway is disabled in this environment ['.app()->environment().'].');
         }
+    }
+
+    public function getName(): string
+    {
+        return Gateway::FAKE->value;
     }
 
     public function createSubscription(Subscription $subscription, array $options = []): mixed

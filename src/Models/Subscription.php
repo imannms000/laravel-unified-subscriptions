@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionPaymentFailed;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionPaymentSucceeded;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionTransactionCreated;
@@ -21,6 +22,7 @@ class Subscription extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'gateway' => Gateway::class,
         'gateway_response' => 'array',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',

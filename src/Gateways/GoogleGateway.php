@@ -31,6 +31,11 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         $this->packageName = config('subscription.gateways.google.package_name');
     }
 
+    public function getName(): string
+    {
+        return Gateway::GOOGLE->value;
+    }
+
     public function createSubscription(Subscription $subscription, array $options = []): mixed
     {
         $token = $options['purchase_token'] ?? null;

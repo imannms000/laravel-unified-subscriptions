@@ -25,6 +25,11 @@ class PayPalGateway extends AbstractGateway implements GatewayInterface
         $this->client->getAccessToken(); // Refreshes token if needed
     }
 
+    public function getName(): string
+    {
+        return Gateway::PAYPAL->value;
+    }
+
     public function createSubscription(Subscription $subscription, array $options = []): mixed
     {
         $plan = $subscription->plan;

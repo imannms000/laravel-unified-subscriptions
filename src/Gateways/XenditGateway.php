@@ -30,6 +30,11 @@ class XenditGateway extends AbstractGateway implements GatewayInterface
         }
     }
 
+    public function getName(): string
+    {
+        return Gateway::XENDIT->value;
+    }
+
     protected function apiRequest(string $method, string $endpoint, array $data = [], ?string $idempotencyKey = null): array
     {
         $response = Http::withBasicAuth($this->secretKey, '')

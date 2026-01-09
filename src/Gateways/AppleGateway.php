@@ -27,6 +27,11 @@ class AppleGateway extends AbstractGateway implements GatewayInterface
         $this->rootCertPath = storage_path('app/apple_root.pem'); // Assume stored here; publishable
     }
 
+    public function getName(): string
+    {
+        return Gateway::APPLE->value;
+    }
+
     protected function getVerifyUrl(): string
     {
         return $this->environment === 'sandbox'
