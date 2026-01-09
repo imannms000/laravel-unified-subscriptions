@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('plan_gateway_prices', function (Blueprint $table) {
             $table->ulid('id');
-            $table->foreignId('plan_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('plan_id')->constrained()->cascadeOnDelete();
             $table->string('gateway'); // paypal, xendit, google_play, apple
             $table->decimal('price', 12, 2);
             $table->string('currency', 3)->default('USD');
