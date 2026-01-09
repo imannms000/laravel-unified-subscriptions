@@ -21,11 +21,13 @@ class SubscriptionController extends Controller
     public function index(Request $request): array
     {
         $subscriptions = $request->user()
-            ->subscriptions()
-            ->with(['plan'])
-            ->withCount('transactions')
-            ->latest()
-            ->get();
+        ->subscriptions()
+        ->with(['plan'])
+        ->withCount('transactions')
+        ->when($request->filter === 'active', fn($q) => $q->active())
+        ->when($request->filter === 'inactive', fn($q) => $q->inactive())
+        ->latest()
+        ->get();
 
         return SubscriptionResource::collection($subscriptions)->resolve();
     }

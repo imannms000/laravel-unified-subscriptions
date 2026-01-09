@@ -224,6 +224,38 @@ class Subscription extends Model
                     ->where('ends_at', '<=', now());
     }
 
+    /**
+     * Scope a query to only include active subscriptions.
+     * Active: Not canceled AND (Trial is future OR EndsAt is null/future)
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereNull('canceled_at')
+            ->where(function ($q) {
+                $q->where('trial_ends_at', '>', now())
+                  ->orWhereNull('ends_at')
+                  ->orWhere('ends_at', '>', now());
+            });
+    }
+
+    /**
+     * Scope a query to only include inactive subscriptions.
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNotNull('canceled_at')
+              ->orWhere(function ($subQ) {
+                  $subQ->where(function ($trialQ) {
+                      $trialQ->whereNull('trial_ends_at')
+                             ->orWhere('trial_ends_at', '<=', now());
+                  })
+                  ->whereNotNull('ends_at')
+                  ->where('ends_at', '<=', now());
+              });
+        });
+    }
+
     public static function processFakeRenewals(): void
     {
         if (!config('subscription.fake.enabled') || !config('subscription.fake.auto_renew.enabled')) {
