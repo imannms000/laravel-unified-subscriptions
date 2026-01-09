@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('plan_gateway_prices', function (Blueprint $table) {
-            $table->ulid('id');
+            $table->ulid('id')->primary();
             $table->foreignUlid('plan_id')->constrained()->cascadeOnDelete();
             $table->string('gateway'); // paypal, xendit, google_play, apple
             $table->decimal('price', 12, 2);

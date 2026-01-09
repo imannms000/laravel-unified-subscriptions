@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('plans', function (Blueprint $table) {
-            $table->ulid('id');
+            $table->ulid('id')->primary();
             $table->string('name');
             $table->string('slug')->unique(); // premium-monthly
             $table->string('tier')->index(); // premium

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subscription_usage', function (Blueprint $table) {
-            $table->ulid('id');
+            $table->ulid('id')->primary();
             $table->foreignUlid('subscription_id')->constrained()->cascadeOnDelete();
             $table->string('feature_slug')->index();
             $table->unsignedBigInteger('used');

@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subscription_transactions', function (Blueprint $table) {
-            $table->ulid('id');
+            $table->ulid('id')->primary();
             $table->foreignUlid('subscription_id')->constrained()->cascadeOnDelete();
             $table->string('gateway');
             $table->string('gateway_transaction_id')->nullable()->index(); // e.g., PayPal order ID, Xendit invoice ID

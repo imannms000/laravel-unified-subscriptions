@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subscriptions', function (Blueprint $table) {
-            $table->ulid();
+            $table->ulid('id')->primary();
             $table->ulidMorphs('subscribable'); // subscribable_id + subscribable_type
             $table->foreignUlid('plan_id')->constrained()->cascadeOnDelete();
             $table->string('gateway')->index(); // paypal, xendit, google_play, apple
