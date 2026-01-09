@@ -131,7 +131,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         $subscriptionNotification = $data['subscriptionNotification'] ?? null;
 
         if (! $subscriptionNotification) {
-            \Log::debug('Google Play subscription', [
+            \Log::debug('Google webhook: missing subscription notification', [
                 'subscriptionNotification' => $subscriptionNotification,
                 'payload' => $payload
             ]);
@@ -142,7 +142,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         $type = (int) ($subscriptionNotification['notificationType'] ?? 0);
 
         if (! $token) {
-            \Log::debug('Google Play subscription', [
+            \Log::debug('Google webhook: missing token', [
                 'token' => $token,
                 'type' => $type,
                 'payload' => $payload
@@ -155,7 +155,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             ->first();
 
         if (! $subscription) {
-            \Log::debug('Google Play subscription', [
+            \Log::debug('Google webhook: Subscription not found', [
                 'token' => $token,
                 'subscription' => $subscription,
                 'payload' => $payload

@@ -11,16 +11,16 @@ class SubscriptionResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'              => $this->id,
-            'status'          => $this->isActive() ? 'active' : 'inactive',
-            'tier'            => $this->plan->tier,
-            'plan'            => $this->plan->name,
-            'ends_at'         => $this->ends_at?->toDateString(),
-            'gateway_id'      => $this->gateway_id,
-            'trial_ends_at'   => $this->trial_ends_at?->toDateString(),
-            'transactions_count' => $this->transactions_count,
-            'renewal_count'   => $this->renewal_count,
-            'gateway_response' => $this->gateway_response,
+            'id'                => $this->id,
+            'status'            => $this->isActive() ? 'active' : 'inactive',
+            'tier'              => $this->plan->tier,
+            'plan'              => $this->plan->name,
+            'endsAt'            => $this->ends_at?->toDateString(),
+            'gatewayId'         => $this->gateway_id,
+            'trialEndsAt'       => $this->trial_ends_at?->toDateString(),
+            'transactionsCount' => $this->transactions_count,
+            'renewalCount'      => $this->renewal_count,
+            'gatewayResponse'   => $this->gateway_response,
         ];
     }
 }

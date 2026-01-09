@@ -48,10 +48,10 @@ class PayPalSubscriptionController extends Controller
                 'success' => true,
                 'message' => 'PayPal checkout initiated. Redirect user to approval URL.',
                 'data' => [
-                    'subscription_id' => $subscription->id,
-                    'approval_url' => collect($paypalResponse['links'] ?? [])
+                    'subscriptionId' => $subscription->id,
+                    'approvalUrl' => collect($paypalResponse['links'] ?? [])
                         ->firstWhere('rel', 'approve')['href'] ?? null,
-                    'subscription_id_paypal' => $paypalResponse['id'] ?? null,
+                    'subscriptionIdPaypal' => $paypalResponse['id'] ?? null,
                 ],
             ]);
         } catch (\Exception $e) {

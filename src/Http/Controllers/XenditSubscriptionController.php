@@ -46,12 +46,12 @@ class XenditSubscriptionController extends Controller
                 'success' => true,
                 'message' => 'Xendit recurring payment created. User must complete payment.',
                 'data' => [
-                    'subscription_id' => $subscription->id,
-                    'reference_id' => $response['reference_id'],
-                    'customer_id' => $response['customer_id'],
+                    'subscriptionId' => $subscription->id,
+                    'referenceId' => $response['reference_id'],
+                    'customerId' => $response['customer_id'],
                     'currency' => $response['currency'],
                     'amount' => $response['amount'],
-                    'action_url' => $action_url,
+                    'actionUrl' => $action_url,
                 ],
             ], 201);
         } catch (Exception $e) {

@@ -2,20 +2,19 @@
 
 namespace Imannms000\LaravelUnifiedSubscriptions\Http\Controllers;
 
-use Imannms000\LaravelUnifiedSubscriptions\Gateways\GooglePlayGateway;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
-use Imannms000\LaravelUnifiedSubscriptions\Models\Subscription;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Routing\Controller;
 use Exception;
 use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
+use Imannms000\LaravelUnifiedSubscriptions\Gateways\GoogleGateway;
 use Imannms000\LaravelUnifiedSubscriptions\Http\Requests\VerifyGoogleSubscriptionRequest;
 
 class GoogleSubscriptionController extends Controller
 {
-    public function verify(VerifyGoogleSubscriptionRequest $request, GooglePlayGateway $gateway): JsonResponse
+    public function verify(VerifyGoogleSubscriptionRequest $request, GoogleGateway $gateway): JsonResponse
     {
         $user = $request->user();
         $planId = $request->validated('plan_id');
@@ -67,9 +66,9 @@ class GoogleSubscriptionController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Subscription activated successfully.',
-                    'subscription_id' => $subscription->id,
-                    'ends_at' => $subscription->ends_at?->toISOString(),
-                    'is_active' => $subscription->isActive(),
+                    'subscriptionId' => $subscription->id,
+                    'endsAt' => $subscription->ends_at?->toISOString(),
+                    'isActive' => $subscription->isActive(),
                 ]);
             });
         } catch (Exception $e) {
