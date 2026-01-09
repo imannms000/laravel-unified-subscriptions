@@ -15,7 +15,7 @@ class FakeGateway extends AbstractGateway implements GatewayInterface
     {
         parent::__construct();
 
-        if (!config('subscription.fake.enabled')) {
+        if (!config('subscription.gateways.fake.enabled')) {
             throw new Exception('Fake gateway is disabled in this environment ['.app()->environment().'].');
         }
     }
@@ -25,8 +25,8 @@ class FakeGateway extends AbstractGateway implements GatewayInterface
         // Instant activation
         $plan = $subscription->plan;
 
-        $unit = config('subscription.fake.auto_renew.unit', 'minutes');
-        $interval = config('subscription.fake.auto_renew.interval', 5);
+        $unit = config('subscription.gateways.fake.auto_renew.unit', 'minutes');
+        $interval = config('subscription.gateways.fake.auto_renew.interval', 5);
 
         $endsAt = now()->add($unit, $interval);
 
@@ -92,7 +92,7 @@ class FakeGateway extends AbstractGateway implements GatewayInterface
      */
     public function renewSubscription(Subscription $subscription): void
     {
-        $max = config('subscription.fake.auto_renew.max_renewals', 999);
+        $max = config('subscription.gateways.fake.auto_renew.max_renewals', 999);
 
         if ($subscription->renewal_count >= $max) {
             $this->markSubscriptionAsCanceled($subscription);
@@ -101,8 +101,8 @@ class FakeGateway extends AbstractGateway implements GatewayInterface
         }
 
         // Use FAKE config interval, NOT the real plan interval
-        $unit = config('subscription.fake.auto_renew.unit', 'minutes');
-        $intervalCount = config('subscription.fake.auto_renew.interval', 5);
+        $unit = config('subscription.gateways.fake.auto_renew.unit', 'minutes');
+        $intervalCount = config('subscription.gateways.fake.auto_renew.interval', 5);
 
         $from = $subscription->ends_at ?? now();
         $nextEndsAt = $from->add($unit, $intervalCount);
