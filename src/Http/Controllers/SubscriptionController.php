@@ -5,7 +5,9 @@ namespace Imannms000\LaravelUnifiedSubscriptions\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Collection;
 use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\PayPalGateway;
 use Imannms000\LaravelUnifiedSubscriptions\Http\Resources\SubscriptionResource;
@@ -16,7 +18,7 @@ class SubscriptionController extends Controller
     /**
      * Get user's subscriptions (status updates via webhook)
      */
-    public function index(Request $request): JsonResource
+    public function index(Request $request): array
     {
         $subscriptions = $request->user()
             ->subscriptions()
@@ -25,7 +27,7 @@ class SubscriptionController extends Controller
             ->latest()
             ->get();
 
-        return SubscriptionResource::collection($subscriptions);
+        return SubscriptionResource::collection($subscriptions)->resolve();
     }
 
     /**
