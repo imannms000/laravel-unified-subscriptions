@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionPaymentFailed;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionPaymentSucceeded;
 use Imannms000\LaravelUnifiedSubscriptions\Events\SubscriptionTransactionCreated;
@@ -15,7 +16,7 @@ use Imannms000\LaravelUnifiedSubscriptions\Gateways\FakeGateway;
 
 class Subscription extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     protected $guarded = [];
 
