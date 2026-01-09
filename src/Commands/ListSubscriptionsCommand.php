@@ -99,17 +99,17 @@ class ListSubscriptionsCommand extends Command
             }
 
             // Gateway badge
-            $gatewayBadge = match($subscription->gateway) {
+            $gatewayBadge = match($subscription->gateway->value) {
                 'fake' => '<fg=magenta>FAKE</>',
                 'paypal' => '<fg=blue>PayPal</>',
                 'xendit' => '<fg=cyan>Xendit</>',
                 'google' => '<fg=green>Google</>',
                 'apple' => '<fg=white;bg=black>Apple</>',
-                default => strtoupper($subscription->gateway),
+                default => strtoupper($subscription->gateway->value),
             };
 
             // Renewal count (fake only)
-            $renewals = $subscription->gateway === 'fake'
+            $renewals = $subscription->gateway->value === 'fake'
                 ? "{$subscription->renewal_count}/" . (config('subscription.fake.auto_renew.max_renewals') ?? '∞')
                 : '-';
 

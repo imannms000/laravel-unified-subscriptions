@@ -16,7 +16,7 @@ class FakeRenewSubscriptionCommand extends Command
     {
         $subscription = Subscription::findOrFail($this->argument('subscriptionId'));
 
-        if ($subscription->gateway !== 'fake') {
+        if ($subscription->gateway->value !== 'fake') {
             $this->error('Only fake subscriptions can be manually renewed.');
             return self::FAILURE;
         }

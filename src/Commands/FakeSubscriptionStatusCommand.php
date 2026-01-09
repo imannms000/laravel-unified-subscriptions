@@ -22,7 +22,7 @@ class FakeSubscriptionStatusCommand extends Command
             return self::FAILURE;
         }
 
-        if ($subscription->gateway !== 'fake') {
+        if ($subscription->gateway->value !== 'fake') {
             $this->error('This command only works on fake gateway subscriptions.');
             return self::FAILURE;
         }
