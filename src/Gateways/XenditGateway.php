@@ -278,7 +278,7 @@ class XenditGateway extends AbstractGateway implements GatewayInterface
     {
         $data = $payload['data'];
 
-        $this->markSubscriptionAsActive($subscription, $data['id'] ?? $subscription->gateway_id);
+        $this->markSubscriptionAsActive($subscription, $data['id'] ?? $subscription->gateway_id, null, $payload);
 
         // First payment may be included on activation if immediate_action_type FULL_AMOUNT
         $amount = $data['amount'] ?? $subscription->plan->getPriceForGateway(Gateway::XENDIT->value);
@@ -308,7 +308,7 @@ class XenditGateway extends AbstractGateway implements GatewayInterface
             metadata: $payload
         );
 
-        $this->markSubscriptionAsRenewed($subscription, null);
+        $this->markSubscriptionAsRenewed($subscription, null, $payload);
     }
 
     protected function handleCycleFailed(Subscription $subscription, array $payload): void

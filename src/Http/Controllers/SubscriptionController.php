@@ -4,9 +4,11 @@ namespace Imannms000\LaravelUnifiedSubscriptions\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Controller;
 use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 use Imannms000\LaravelUnifiedSubscriptions\Gateways\PayPalGateway;
+use Imannms000\LaravelUnifiedSubscriptions\Http\Resources\SubscriptionResource;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Subscription;
 
 class SubscriptionController extends Controller
@@ -14,40 +16,28 @@ class SubscriptionController extends Controller
     /**
      * Get user's subscriptions (status updates via webhook)
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): JsonResource
     {
         $subscriptions = $request->user()
             ->subscriptions()
-            ->with(['plan', 'transactions'])
+            ->with(['plan'])
+            ->withCount('transactions')
             ->latest()
             ->get();
 
-        return response()->json([
-            'data' => $subscriptions->map(fn($sub) => [
-                'id' => $sub->id,
-                'status' => $sub->isActive() ? 'active' : 'inactive',
-                'plan' => $sub->plan->name,
-                'ends_at' => $sub->ends_at?->toDateString(),
-                'gateway_id' => $sub->gateway_id,
-                'trial_ends_at' => $sub->trial_ends_at?->toDateString(),
-                'transactions_count' => $sub->transactions()->count(),
-            ]),
-        ]);
+        return SubscriptionResource::collection($subscriptions);
     }
 
     /**
      * Status Check 
      */
-    public function show(Request $request, Subscription $subscription): JsonResponse
+    public function show(Request $request, Subscription $subscription): JsonResource
     {
         // $this->authorize('view', $subscription);
+
+        $subscription->load('plan')->loadCount('transactions');
         
-        return response()->json([
-            'id' => $subscription->id,
-            'status' => $subscription->isActive() ? 'active' : 'pending',
-            'gateway_id' => $subscription->gateway_id,
-            'can_use_features' => $subscription->isActive(),
-        ]);
+        return new SubscriptionResource($subscription);
     }
 
     /**

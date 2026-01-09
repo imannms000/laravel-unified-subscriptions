@@ -21,6 +21,7 @@ class Subscription extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'gateway_response' => 'array',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
         'trial_ends_at' => 'datetime',
@@ -244,5 +245,12 @@ class Subscription extends Model
                     $gateway->renewSubscription($subscription);
                 }
             });
+    }
+
+    public function getGoogleExpiryFromResponse()
+    {
+        $latestLineItem = $subscription->gateway_response['lineItems'][0] ?? null;
+        $expirySeconds = $latestLineItem['expiryTime']['seconds'] ?? null;
+        return $expirySeconds;
     }
 }

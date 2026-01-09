@@ -62,7 +62,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         $endsAt = $expiryMs ? Carbon::createFromTimestampMs($expiryMs) : null;
 
         // Mark subscription as active
-        $this->markSubscriptionAsActive($subscription, $token, $endsAt);
+        $this->markSubscriptionAsActive($subscription, $token, $endsAt, (array) $response->toSimpleObject());
 
         // Record initial transaction
         $price = $subscription->plan->getPriceForGateway(Gateway::GOOGLE->value);
@@ -131,6 +131,10 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         $subscriptionNotification = $data['subscriptionNotification'] ?? null;
 
         if (! $subscriptionNotification) {
+            \Log::debug('Google Play subscription', [
+                'subscriptionNotification' => $subscriptionNotification,
+                'payload' => $payload
+            ]);
             return;
         }
 
@@ -138,6 +142,11 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         $type = (int) ($subscriptionNotification['notificationType'] ?? 0);
 
         if (! $token) {
+            \Log::debug('Google Play subscription', [
+                'token' => $token,
+                'type' => $type,
+                'payload' => $payload
+            ]);
             return;
         }
 
@@ -146,6 +155,11 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             ->first();
 
         if (! $subscription) {
+            \Log::debug('Google Play subscription', [
+                'token' => $token,
+                'subscription' => $subscription,
+                'payload' => $payload
+            ]);
             return;
         }
 
@@ -182,7 +196,18 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
 
         // Sync local ends_at if fresh data available
         if (isset($response)) {
-            $subscription->update(['ends_at' => $endsAt]);
+            $subscription->update([
+                'gateway_response' => (array) $response->toSimpleObject(),
+                'ends_at' => $endsAt
+            ]);
         }
+
+        \Log::debug('Google Play subscription updated', [
+            'subscription_id' => $subscription->id,
+            'token' => $token,
+            'ends_at' => $endsAt,
+            'payload' => $payload,
+            'gateway_response' => (array) $response->toSimpleObject(),
+        ]);
     }
 }

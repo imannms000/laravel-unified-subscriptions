@@ -63,7 +63,7 @@ class AppleGateway extends AbstractGateway implements GatewayInterface
 
         $gatewayId = $latestReceiptInfo['original_transaction_id'] ?? $latestReceiptInfo['transaction_id'];
 
-        $this->markSubscriptionAsActive($subscription, $gatewayId, $endsAt);
+        $this->markSubscriptionAsActive($subscription, $gatewayId, $endsAt, $response);
 
         // Record initial transaction
         $price = $subscription->plan->getPriceForGateway(Gateway::APPLE->value);
@@ -162,7 +162,7 @@ class AppleGateway extends AbstractGateway implements GatewayInterface
     protected function handleRenewOrSubscribe(Subscription $subscription, array $decodedTransaction): void
     {
         $endsAt = $decodedTransaction['expiresDate'] ? Carbon::createFromTimestampMs($decodedTransaction['expiresDate']) : null;
-        $this->markSubscriptionAsRenewed($subscription, $endsAt);
+        $this->markSubscriptionAsRenewed($subscription, $endsAt, $decodedTransaction);
 
         $price = $decodedTransaction['price'] ?? $subscription->plan->getPriceForGateway(Gateway::APPLE->value);
         $currency = $decodedTransaction['currency'] ?? $subscription->plan->getCurrencyForGateway(Gateway::APPLE->value);

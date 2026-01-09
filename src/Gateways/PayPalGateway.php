@@ -164,7 +164,7 @@ class PayPalGateway extends AbstractGateway implements GatewayInterface
         // PayPal doesn't always provide next_billing_time on activation
         // You may fetch subscription details if needed: $this->client->showSubscriptionDetails($subscription->gateway_id)
 
-        $this->markSubscriptionAsActive($subscription, $subscription->gateway_id, $endsAt);
+        $this->markSubscriptionAsActive($subscription, $subscription->gateway_id, $endsAt, $payload);
 
         // Record initial payment if any
         $price = $subscription->plan->getPriceForGateway(Gateway::PAYPAL->value);
@@ -192,7 +192,7 @@ class PayPalGateway extends AbstractGateway implements GatewayInterface
             metadata: $payload
         );
 
-        $this->markSubscriptionAsRenewed($subscription, null);
+        $this->markSubscriptionAsRenewed($subscription, null, $payload);
     }
 
     protected function handleSubscriptionUpdated(Subscription $subscription, array $payload): void

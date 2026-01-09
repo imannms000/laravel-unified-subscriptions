@@ -22,11 +22,12 @@ abstract class AbstractGateway
         return $this->name;
     }
 
-    protected function markSubscriptionAsActive(Subscription $subscription, string $gatewayId, ?\Carbon\Carbon $endsAt = null): void
+    protected function markSubscriptionAsActive(Subscription $subscription, string $gatewayId, ?\Carbon\Carbon $endsAt = null, ?array $gateway_response = null): void
     {
         $subscription->update([
             'gateway' => $this->getName(),
             'gateway_id' => $gatewayId,
+            'gateway_response' => $gateway_response,
             'starts_at' => now(),
             'ends_at' => $endsAt,
             'trial_ends_at' => $subscription->plan->trial_days ? now()->addDays($subscription->plan->trial_days) : null,
@@ -42,7 +43,7 @@ abstract class AbstractGateway
         event(new SubscriptionCanceled($subscription));
     }
 
-    protected function markSubscriptionAsRenewed(Subscription $subscription, ?\Carbon\Carbon $endsAt): void
+    protected function markSubscriptionAsRenewed(Subscription $subscription, ?\Carbon\Carbon $endsAt, ?array $gateway_response = null): void
     {
         if ($endsAt === null) {
             // Gateway didn't provide next date → calculate from current state
@@ -56,7 +57,10 @@ abstract class AbstractGateway
         // Update ends_at and increment renewal_count atomically
         // it's atomic at database level → safe if multiple webhooks hit
         // and avoids race conditions
-        $subscription->updateEndsAt($endsAt);
+        $subscription->update([
+            'ends_at' => $endsAt,
+            'gateway_response' => $gateway_response,
+        ]);
         $subscription->incrementRenewalCount();
         event(new SubscriptionRenewed($subscription));
     }
