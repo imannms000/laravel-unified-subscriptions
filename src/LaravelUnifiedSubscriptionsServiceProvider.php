@@ -47,16 +47,14 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
 			]);
 		}
 
-        if ($this->app->runningInConsole()) {
-            $this->app->booted(function () {
-                $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
-                // $schedule->job(new RenewSubscriptionsJob)->daily();
+        $this->app->booted(function () {
+            $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+            // $schedule->job(new RenewSubscriptionsJob)->daily();
 
-                if (config('subscription.fake.enabled') && config('subscription.fake.auto_renew.enabled')) {
-                    $schedule->command('subscription:fake:process-renewals')->everyMinute()->withoutOverlapping(3);
-                }
-            });
-        }
+            if (config('subscription.fake.enabled') && config('subscription.fake.auto_renew.enabled')) {
+                $schedule->command('subscription:fake:process-renewals')->everyMinute()->withoutOverlapping(3);
+            }
+        });
 
         $this->app->singleton(GatewayManager::class);
     }
