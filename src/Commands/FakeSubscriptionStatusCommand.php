@@ -28,7 +28,7 @@ class FakeSubscriptionStatusCommand extends Command
         }
 
         $plan = $subscription->plan;
-        $config = config('subscription.fake.auto_renew');
+        $config = config('subscription.gateways.fake.auto_renew');
 
         $this->newLine();
         $this->info("Fake Subscription Status");
@@ -73,8 +73,8 @@ class FakeSubscriptionStatusCommand extends Command
         $this->table(
             ['Setting', 'Value'],
             [
-                ['Enabled', config('subscription.fake.auto_renew.enabled') ? '<fg=green>Yes</>' : '<fg=red>No</>'],
-                ['Interval', config('subscription.fake.auto_renew.interval') . ' ' . config('subscription.fake.auto_renew.unit')],
+                ['Enabled', config('subscription.gateways.fake.auto_renew.enabled') ? '<fg=green>Yes</>' : '<fg=red>No</>'],
+                ['Interval', config('subscription.gateways.fake.auto_renew.interval') . ' ' . config('subscription.gateways.fake.auto_renew.unit')],
                 ['Max Renewals', $max],
             ]
         );

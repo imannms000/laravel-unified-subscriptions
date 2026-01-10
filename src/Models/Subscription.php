@@ -258,7 +258,7 @@ class Subscription extends Model
 
     public static function processFakeRenewals(): void
     {
-        if (!config('subscription.fake.enabled') || !config('subscription.fake.auto_renew.enabled')) {
+        if (!config('subscription.gateways.fake.enabled') || !config('subscription.gateways.fake.auto_renew.enabled')) {
             \Log::info('[FakeGateway] Auto-renew disabled or fake gateway not enabled.');
             return;
         }

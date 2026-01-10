@@ -51,7 +51,7 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
             $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
             // $schedule->job(new RenewSubscriptionsJob)->daily();
 
-            if (config('subscription.fake.enabled') && config('subscription.fake.auto_renew.enabled')) {
+            if (config('subscription.gateways.fake.enabled') && config('subscription.gateways.fake.auto_renew.enabled')) {
                 $schedule->command('subscription:fake:process-renewals')->everyMinute()->withoutOverlapping(3);
             }
         });

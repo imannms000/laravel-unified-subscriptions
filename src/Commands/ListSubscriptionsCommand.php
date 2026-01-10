@@ -110,7 +110,7 @@ class ListSubscriptionsCommand extends Command
 
             // Renewal count (fake only)
             $renewals = $subscription->gateway->value === 'fake'
-                ? "{$subscription->renewal_count}/" . (config('subscription.fake.auto_renew.max_renewals') ?? '∞')
+                ? "{$subscription->renewal_count}/" . (config('subscription.gateways.fake.auto_renew.max_renewals') ?? '∞')
                 : '-';
 
             // Latest transaction
