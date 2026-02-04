@@ -91,6 +91,7 @@ return [
             'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\GoogleGateway::class,
             'package_name' => env('GOOGLE_PLAY_PACKAGE_NAME'),
             'service_account' => env('GOOGLE_PLAY_SERVICE_ACCOUNT', base_path('google-play-service-account.json')),
+            'obfuscation_salt' => env('GOOGLE_PLAY_OBFUSCATION_SALT', 'default-stable-salt-change-this-in-prod'),
         ],
         'apple' => [
             'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\AppleGateway::class,
@@ -167,6 +168,8 @@ app(GoogleGateway::class)->createSubscription($subscription, [
 ]);
 ```
 
+    NOTE: For Google Play integrations, the `createSubscription` method should be omitted. The system automatically provisions the subscription via Real-Time Developer Notifications (RTDN).
+
 ### Checking Subscription Status
 
 ```php
@@ -230,6 +233,8 @@ Event::listen(SubscriptionRenewed::class, function ($event) {
 ```
 
 ## Commands
+
+### \# Plan
 
 ### Create a Plan
 
@@ -378,11 +383,118 @@ php artisan subscription:plan:delete 5 --force
 ```
 Skips confirmation, permanently deletes.
 
-### c. Attempt to Delete Plan with Active Subscriptions
+#### c. Attempt to Delete Plan with Active Subscriptions
 ```bash
 php artisan subscription:plan:delete premium-monthly
 ```
 Shows error: `"Cannot delete... has X active subscription(s)"`
+
+#
+
+### \# Plan Gateway Prices
+
+### Add a Gateway Price
+
+#### a. Add Google Play base plan
+```bash
+# using plan slug
+php artisan subscription:gateway-price:add \
+  premium-monthly \
+  google_play \
+  9.99 \
+  USD \
+  --plan-id=premium_monthly \
+  --offer-id=premium_monthly_trial \
+  --product-id=premium \
+  --plan-name="Premium Monthly - Trial"
+```
+
+#### b. Add PayPal plan (no offer/product)
+```bash
+# using plan id
+php artisan subscription:gateway-price:add \
+  01J9K9M7P8X3R3C4U6N6W7X0YSS \
+  paypal \
+  9.99 \
+  USD \
+  --plan-id=P-2UF78835G6984125U \
+  --plan-name="PayPal Premium Monthly"
+```
+
+#### c. Update existing
+```bash
+php artisan subscription:gateway-price:add \
+  premium-monthly \
+  google \
+  12.99 \
+  USD \
+  --plan-id=premium_monthly
+```
+
+### List Gateway Prices
+
+#### a. List all gateway prices
+
+```bash
+php artisan subscription:gateway-price:list
+```
+
+#### b. List only for specific plan
+
+```bash
+# by plan slug
+php artisan subscription:gateway-price:list premium-monthly
+# or by plan ID
+php artisan subscription:gateway-price:list 01J9K9M7P8X3R3C4U6N6W7X0YSS
+```
+
+#### c. Filter by gateway
+```bash
+php artisan subscription:gateway-price:list --gateway=paypal
+```
+
+#### d. Show only active plan
+```bash
+php artisan subscription:gateway-price:list --active
+```
+
+#### e. Search across plan name or gateway plan name
+```bash
+php artisan subscription:gateway-price:list --search=trial
+```
+
+#### f. Sample output
+
+```text
+Found 6 gateway price record(s):
+
++---------+---------------------+-------------------+-------------+-----------------+------------------+-------------------+---------------------------+----------+-------------+
+| Plan ID | Plan Name           | Plan Slug         | Gateway     | gateway_plan_id | gateway_offer_id | gateway_product_id | gateway_plan_name         | Price    | Plan Status |
++---------+---------------------+-------------------+-------------+-----------------+------------------+-------------------+---------------------------+----------+-------------+
+| 1       | Premium Monthly     | premium-monthly   | google_play | premium_monthly | trial-7days      | premium           | Premium Monthly - Trial   | 0.00 USD | Active      |
+| 1       | Premium Monthly     | premium-monthly   | paypal      | P-2UF78835...   | -                | -                 | PayPal Premium Monthly    | 9.99 USD | Active      |
+| 2       | Pro Yearly          | pro-yearly        | google_play | pro_yearly      | -                | pro               | Pro Yearly Base           | 99.00 USD| Active      |
++---------+---------------------+-------------------+-------------+-----------------+------------------+-------------------+---------------------------+----------+-------------+
+```
+
+### Delete a Gateway Prices
+
+#### a. Delete single entry
+
+```bash
+php artisan subscription:gateway-price:remove 01J8K9M7P8Q2R3T4U5V6W7X8Y9Z
+```
+
+#### b. Delete all entries under specific plan and gateway
+
+```bash
+php artisan subscription:gateway-price:remove premium-monthly --gateway=google
+```
+
+#### c. Delete all entries under specific plan
+```bash
+php artisan subscription:gateway-price:remove premium-monthly
+```
 
 ## Extending with New Gateways
 

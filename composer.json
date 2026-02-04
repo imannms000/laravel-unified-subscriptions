@@ -20,6 +20,7 @@
         "php": "^8.2",
         "firebase/php-jwt": "^6.11",
         "google/apiclient": "^2.18",
+        "hashids/hashids": "^5.0",
         "illuminate/container": "^11.0|^12.0|^13.0|^14.0|^15.0",
         "illuminate/database": "^11.0|^12.0|^13.0|^14.0|^15.0",
         "illuminate/events": "^11.0|^12.0|^13.0|^14.0|^15.0",

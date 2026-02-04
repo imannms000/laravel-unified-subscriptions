@@ -25,6 +25,7 @@ return [
             'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\GoogleGateway::class,
             'package_name' => env('GOOGLE_PLAY_PACKAGE_NAME'),
             'service_account' => env('GOOGLE_PLAY_SERVICE_ACCOUNT', base_path('google-play-service-account.json')),
+            'obfuscation_salt' => env('GOOGLE_PLAY_OBFUSCATION_SALT', 'default-stable-salt-change-this-in-prod'), // To hash user id for Google Play Billing. NEVER ROTATE THIS!
         ],
         'apple' => [
             'driver' => \Imannms000\LaravelUnifiedSubscriptions\Gateways\AppleGateway::class,

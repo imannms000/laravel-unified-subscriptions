@@ -12,12 +12,15 @@ use Carbon\Carbon;
 use Exception;
 use Google\Service\AndroidPublisher\CancelSubscriptionPurchaseRequest;
 use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
+use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
 
 class GoogleGateway extends AbstractGateway implements GatewayInterface
 {
     protected AndroidPublisher $service;
 
     protected string $packageName;
+
+    protected string $userModel;
 
     public function __construct()
     {
@@ -29,6 +32,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
 
         $this->service = new AndroidPublisher($client);
         $this->packageName = config('subscription.gateways.google.package_name');
+        $this->userModel = config('subscription.models.user');
     }
 
     public function getName(): string
@@ -144,6 +148,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         }
 
         $token = $subscriptionNotification['purchaseToken'] ?? null;
+        $obfuscatedId = $subscriptionNotification['obfuscatedExternalAccountId'] ?? null;
         $type = (int) ($subscriptionNotification['notificationType'] ?? 0);
 
         if (! $token) {
@@ -155,22 +160,13 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             return;
         }
 
-        $subscription = Subscription::where('gateway', Gateway::GOOGLE->value)
-            ->where('gateway_id', $token)
-            ->first();
-
-        if (! $subscription) {
-            \Log::debug('Google webhook: Subscription not found', [
-                'token' => $token,
-                'subscription' => $subscription,
-                'payload' => $payload
-            ]);
-            return;
-        }
-
         // Always fetch latest state from Google for accuracy
         try {
             $response = $this->service->purchases_subscriptionsv2->get($this->packageName, $token);
+
+            $basePlanId = $response->lineItems[0]->offerDetails->basePlanId ?? null;
+            $offerId    = $response->lineItems[0]->offerDetails->offerId ?? null;
+            $productId  = $response->lineItems[0]->productId ?? null;
 
             $lineItems = $response->lineItems ?? [];
             $expiryMs = 0;
@@ -189,6 +185,79 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         } catch (Exception $e) {
             // Fallback to notification type if API call fails
             $endsAt = null;
+        }
+
+        $subscription = Subscription::where('gateway', Gateway::GOOGLE->value)
+            ->where('gateway_id', $token)
+            ->first();
+
+        // Attach user if subscription already exists but has no user
+        if ($subscription && $obfuscatedId && !$subscription->subscribable_id) {
+            $user = $this->userModel::findByGoogleObfuscatedId($obfuscatedId);
+            if ($user) {
+                $subscription->update([
+                    'subscribable_id' => $user->id,
+                    'subscribable_type' => $user->getMorphClass(),
+                ]);
+            }
+        }
+
+        // If not found, try to create one using obfuscatedAccountId
+        if (! $subscription && $obfuscatedId) {
+            $user = $this->userModel::findByGoogleObfuscatedId($obfuscatedId); // using the trait method
+
+            if ($user) {
+                $plan = Plan::whereHas('gatewayPrices', function ($q) use ($basePlanId) {
+                    $q->where('gateway', Gateway::GOOGLE->value)
+                    ->where('gateway_plan_id', $basePlanId);
+                })->first();
+
+                if (! $plan) {
+                    \Log::warning('No plan matched basePlanId from Google RTDN', [
+                        'basePlanId' => $basePlanId,
+                        'obfuscated_id' => $obfuscatedId,
+                        'token' => $token,
+                    ]);
+                    return;
+                }
+
+                $subscription = $user->subscriptions()->create([
+                    'plan_id' => $plan->id,
+                    'gateway' => Gateway::GOOGLE->value,
+                    'gateway_id' => $token,
+                    'starts_at' => now(),
+                    // Add other defaults (trial_ends_at, etc.) as needed
+                ]);
+
+                \Log::info('Created new subscription from Google RTDN using obfuscatedAccountId', [
+                    'user_id' => $user->id,
+                    'token' => $token,
+                    'obfuscated_id' => $obfuscatedId,
+                    'productId' => $productId,
+                    'basePlanId' => $basePlanId,
+                    'offerId' => $offerId,
+                    'gateway_response' => (array) $response?->toSimpleObject(),
+                ]);
+            } else {
+                \Log::warning('Google RTDN received with unknown obfuscatedAccountId', [
+                    'obfuscated_id' => $obfuscatedId,
+                    'token' => $token,
+                    'type' => $type,
+                    'gateway_response' => (array) $response?->toSimpleObject(),
+                ]);
+                return; // or create pending subscription if you want
+            }
+        }
+
+        if (! $subscription) {
+            // If still no subscription, wait for receipt
+            \Log::debug('Google webhook: Subscription not found', [
+                'token' => $token,
+                'subscription' => $subscription,
+                'payload' => $payload,
+                'gateway_response' => (array) $response?->toSimpleObject(),
+            ]);
+            return;
         }
 
         // Handle key notification types
@@ -212,7 +281,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             'token' => $token,
             'ends_at' => $endsAt,
             'payload' => $payload,
-            'gateway_response' => (array) $response->toSimpleObject(),
+            'gateway_response' => (array) $response?->toSimpleObject(),
         ]);
     }
 }
