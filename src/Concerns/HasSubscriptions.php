@@ -7,6 +7,7 @@ use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
 use Carbon\Carbon;
 use Hashids\Hashids;
 use Illuminate\Support\Facades\Log;
+use Imannms000\LaravelUnifiedSubscriptions\Support\GoogleBillingId;
 
 trait HasSubscriptions
 {
@@ -94,17 +95,7 @@ trait HasSubscriptions
      */
     public function getGoogleObfuscatedAccountId(): string
     {
-        // Use a dedicated, stable salt (never rotate this!)
-        $salt = config('subscription.gateways.google.obfuscation_salt', 'default-stable-salt-change-this-in-prod');
-
-        $hashids = new Hashids(
-            $salt,           // your secret salt
-            10,              // min length (adjust as needed, Google allows up to 64 chars)
-            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890' // safe alphabet
-        );
-
-        // Encode user ID only (you can add more values if needed)
-        return $hashids->encode($this->getKey()); // $this->id
+        return GoogleBillingId::encode($this->getKey()); // $this->id
     }
 
     /**
@@ -113,26 +104,11 @@ trait HasSubscriptions
      */
     public static function findByGoogleObfuscatedId(string $obfuscatedId): ?self
     {
-        // Same salt & config as generation
-        $salt = config('subscription.gateways.google.obfuscation_salt', 'default-stable-salt-change-this-in-prod');
+        $userId = GoogleBillingId::decode($obfuscatedId);
 
-        $hashids = new Hashids(
-            $salt,
-            10,
-            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
-        );
-
-        $decoded = $hashids->decode($obfuscatedId);
-
-        if (empty($decoded)) {
-            Log::warning('Invalid or tampered Google obfuscatedAccountId received', [
-                'obfuscated_id' => $obfuscatedId,
-            ]);
+        if (!$userId) {
             return null;
         }
-
-        // First decoded value is the user ID
-        $userId = $decoded[0];
 
         $user = self::find($userId);
 
