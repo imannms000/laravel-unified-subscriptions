@@ -2,15 +2,11 @@
 
 namespace Imannms000\LaravelUnifiedSubscriptions\Commands;
 
-<?php
-
-namespace App\Console\Commands;
-
 use Illuminate\Console\Command;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
 use Imannms000\LaravelUnifiedSubscriptions\Models\PlanGatewayPrice;
 
-class RemovePlanGatewayPrice extends Command
+class RemovePlanGatewayPriceCommand extends Command
 {
     protected $signature = 'subscription:gateway-price:remove
                             {identifier : The Plan ID, slug, or specific Entry ID}

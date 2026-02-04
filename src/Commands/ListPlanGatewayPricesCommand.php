@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
 use Imannms000\LaravelUnifiedSubscriptions\Models\PlanGatewayPrice;
 
-class ListPlanGatewayPrices extends Command
+class ListPlanGatewayPricesCommand extends Command
 {
     protected $signature = 'subscription:gateway-price:list
                             {plan? : Plan ID or slug (optional; shows all if omitted)}
