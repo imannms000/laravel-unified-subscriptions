@@ -36,6 +36,10 @@ class LaravelUnifiedSubscriptionsServiceProvider extends ServiceProvider
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\ListSubscriptionPlansCommand::class,
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\UpdateSubscriptionPlanCommand::class,
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\DeleteSubscriptionPlanCommand::class,
+
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\AddPlanGatewayPrice::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\ListPlanGatewayPrices::class,
+                \Imannms000\LaravelUnifiedSubscriptions\Commands\RemovePlanGatewayPrice::class,
                 
                 \Imannms000\LaravelUnifiedSubscriptions\Commands\ListSubscriptionsCommand::class,
 
