@@ -149,7 +149,6 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         }
 
         $token = $subscriptionNotification['purchaseToken'] ?? null;
-        $obfuscatedId = $subscriptionNotification['obfuscatedExternalAccountId'] ?? null;
         $type = (int) ($subscriptionNotification['notificationType'] ?? 0);
 
         if (! $token) {
@@ -163,8 +162,15 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
 
         // Always fetch latest state from Google for accuracy
         $response = null;
+        $obfuscatedId = null;
         try {
             $response = $this->service->purchases_subscriptionsv2->get($this->packageName, $token);
+
+            if (isset($response->externalAccountIdentifiers)) {
+                $obfuscatedId = $response->externalAccountIdentifiers->obfuscatedExternalAccountId
+                            ?? $response->externalAccountIdentifiers->externalAccountId
+                            ?? null;
+            }
 
             $basePlanId = $response->lineItems[0]->offerDetails->basePlanId ?? null;
             $offerId    = $response->lineItems[0]->offerDetails->offerId ?? null;
@@ -174,12 +180,26 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             $expiryMs = 0;
 
             foreach ($lineItems as $lineItem) {
-                $expiryDetails = $lineItem->expiryTime ?? null;
-                if ($expiryDetails && $expiryDetails->seconds ?? null) {
-                    $currentMs = ($expiryDetails->seconds * 1000) + ($expiryDetails->nanos / 1000000 ?? 0);
-                    if ($currentMs > $expiryMs) {
-                        $expiryMs = $currentMs;
+                $expiryTime = $lineItem->expiryTime ?? null;
+
+                if (!$expiryTime) continue;
+
+                try {
+                    if (is_string($expiryTime)) {
+                        $dt = Carbon::parse($expiryTime);
+                    } elseif (is_object($expiryTime) && isset($expiryTime->seconds)) {
+                        $dt = Carbon::createFromTimestampMs(($expiryTime->seconds * 1000) + ($expiryTime->nanos / 1000000 ?? 0));
+                    } else {
+                        continue;
                     }
+
+                    $currentMs = $dt->getTimestampMs();
+                    $expiryMs = max($expiryMs, $currentMs);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to parse expiryTime', [
+                        'expiryTime' => $expiryTime,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
             }
 
@@ -197,6 +217,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         Log::info('Google webhook: purchases_subscriptionsv2 response', [
             'packageName' => $this->packageName,
             'token' => $token,
+            'obfuscatedId' => $obfuscatedId,
             'response' => $response,
             'subscriptionNotification' => $subscriptionNotification
         ]);
