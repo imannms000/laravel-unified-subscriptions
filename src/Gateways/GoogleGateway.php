@@ -189,8 +189,10 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             $endsAt = null;
         }
 
-        Log::info('Google webhook: Response:', [
-            'response' => $response
+        Log::info('Google webhook: purchases_subscriptionsv2 response', [
+            'packageName' => $this->packageName,
+            'token' => $token,
+            'response' => $response,
         ]);
 
         $subscription = Subscription::where('gateway', Gateway::GOOGLE->value)
