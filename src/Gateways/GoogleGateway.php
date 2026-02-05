@@ -11,6 +11,7 @@ use Imannms000\LaravelUnifiedSubscriptions\Models\Subscription;
 use Carbon\Carbon;
 use Exception;
 use Google\Service\AndroidPublisher\CancelSubscriptionPurchaseRequest;
+use Illuminate\Support\Facades\Log;
 use Imannms000\LaravelUnifiedSubscriptions\Enums\Gateway;
 use Imannms000\LaravelUnifiedSubscriptions\Models\Plan;
 
@@ -161,6 +162,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
         }
 
         // Always fetch latest state from Google for accuracy
+        $response = null;
         try {
             $response = $this->service->purchases_subscriptionsv2->get($this->packageName, $token);
 
@@ -186,6 +188,10 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             // Fallback to notification type if API call fails
             $endsAt = null;
         }
+
+        Log::info('Google webhook: Response:', [
+            'response' => $response
+        ]);
 
         $subscription = Subscription::where('gateway', Gateway::GOOGLE->value)
             ->where('gateway_id', $token)
