@@ -185,6 +185,11 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
 
             $endsAt = $expiryMs ? Carbon::createFromTimestampMs($expiryMs) : null;
         } catch (Exception $e) {
+            Log::error('Google webhook: purchases_subscriptionsv2 fetch failed', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'code' => $e->getCode(),
+            ]);
             // Fallback to notification type if API call fails
             $endsAt = null;
         }
