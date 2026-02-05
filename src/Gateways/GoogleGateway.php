@@ -193,6 +193,7 @@ class GoogleGateway extends AbstractGateway implements GatewayInterface
             'packageName' => $this->packageName,
             'token' => $token,
             'response' => $response,
+            'subscriptionNotification' => $subscriptionNotification
         ]);
 
         $subscription = Subscription::where('gateway', Gateway::GOOGLE->value)
